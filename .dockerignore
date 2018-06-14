@@ -1,0 +1,6 @@
+._ignore/
+.dockerignore
+.gitignore
+cronjob.yml
+Dockerfile
+Makefile

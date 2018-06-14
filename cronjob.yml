@@ -1,0 +1,61 @@
+# First! ☝️
+# Make sure your NPM_TOKEN is set to the token of the main account you want to create the
+# read-only tokens on. This assumes you manage npm logins via ENVIRONMENT variables and not
+# `npm login`. See https://docs.npmjs.com/private-modules/ci-server-config#setting-up-environment-variables
+# for more deatils on setting this in something like `~/.bash_profile` and using `${NPM_TOKEN}`
+# in your `~/.npmrc` file instead of the actual value being hard-coded in there.
+#
+# Second! ✌️
+# Choose your preferred method to create a CronJob in k8s
+#
+# OPTION 1: The `delete-and-create` method                  **RECOMMENDED**
+#    $ kubectl delete npm-token-rotation
+#    $ envsubst < cronjob.yml | kubectl create -f -
+#
+# OPTION 2: The `modify-existing` method                    **MEH**
+# $ envsubst < cronjob.yml | kubectl apply -f -
+#
+# OPTION 3: Don't use this file, run this command instead   **DISCOURAGED**
+#   kubectl run npm-token-rotation \
+#     --schedule="@hourly" \
+#     --restart=OnFailure \
+#     --env="NPM_TOKEN=${NPM_TOKEN}"
+#     --image=yungjames/npm-token-rotation:0.0.1-B135251 \
+#     -- /app/jobs/rotate-npm-token.sh
+#
+# OPTION 4: The `edit-on-the-fly` method                    **DISCOURAGED**
+# $ kubectl edit cronjob npm-token-rotation
+#
+# ---
+#
+# Details around the `schedule`
+#   ┌─── minute (0 - 59)
+#   │ ┌─── hour (0 - 23)
+#   │ │ ┌─── day of month (1 - 31)
+#   │ │ │ ┌─── month (1 - 12)
+#   │ │ │ │ ┌─── day of week (0 - 6) (Sunday to Saturday)
+#   * * * * *              Run every minute
+#   0 0 1 1 *   @yearly    Run once a year at midnight of 1 January (also @annually)
+#   0 0 1 * *   @monthly   Run once a month at midnight of the first day of the month
+#   0 0 * * 0   @weekly    Run once a week at midnight on Sunday morning
+#   0 0 * * *   @daily     Run once a day at midnight
+#   0 * * * *   @hourly    Run once an hour at the beginning of the hour
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: npm-token-rotation
+spec:
+  schedule: "@hourly"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: npm-token-rotation
+            image: yungjames/npm-token-rotation:0.0.1-B135251
+            command: ["/app/jobs/rotate-npm-token.sh"]
+            env:
+            - name: NPM_TOKEN
+              value: "${NPM_TOKEN}" # requires `envsubst` to parse
+          restartPolicy: OnFailure
