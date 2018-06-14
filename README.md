@@ -112,7 +112,6 @@ $ kubectl describe cronjob npm-token-rotation
 Name:                       npm-token-rotation
 Namespace:                  default
 Labels:                     <none>
-Annotations:                <none>
 Schedule:                   @hourly
 Concurrency Policy:         Allow
 Suspend:                    False
@@ -124,19 +123,23 @@ Pod Template:
   Labels:  <none>
   Containers:
    npm-token-rotation:
-    Image:  yungjames/npm-token-rotation:0.0.1-E13F788
+    Image:  yungjames/npm-token-rotation:0.0.1-EC553C6
     Port:   <none>
     Command:
       /app/jobs/rotate-npm-token.sh
     Environment:
-      NPM_TOKEN:     <set to the key 'token' in secret 'npm-token-rotation-npmuser-creds'>     Optional: false
-      NPM_USERNAME:  <set to the key 'username' in secret 'npm-token-rotation-npmuser-creds'>  Optional: false
-      NPM_PASSWORD:  <set to the key 'password' in secret 'npm-token-rotation-npmuser-creds'>  Optional: false
+      NPM_TOKEN:     <set to the key 'token' in secret 'npm-token-rotation-npmuser-creds'>  Optional: false
+      NPM_USER:      <set to the key 'user' in secret 'npm-token-rotation-npmuser-creds'>   Optional: false
+      NPM_PASS:      <set to the key 'pass' in secret 'npm-token-rotation-npmuser-creds'>   Optional: false
     Mounts:          <none>
   Volumes:           <none>
-Last Schedule Time:  <unset>
+Last Schedule Time:  Thu, 14 Jun 2018 18:23:00 -0400
 Active Jobs:         <none>
-Events:              <none>
+Events:
+  Type    Reason            Age   From                Message
+  ----    ------            ----  ----                -------
+  Normal  SuccessfulCreate  11m   cronjob-controller  Created job npm-token-rotation-1529014980
+  Normal  SawCompletedJob   11m   cronjob-controller  Saw completed job: npm-token-rotation-1529014980
 
 
 ## To delete the npm-cnnlabs-creds secret
