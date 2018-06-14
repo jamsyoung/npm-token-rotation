@@ -1,31 +1,35 @@
-# First! ☝️
-# Make sure your NPM_TOKEN is set to the token of the main account you want to create the
-# read-only tokens on. This assumes you manage npm logins via ENVIRONMENT variables and not
-# `npm login`. See https://docs.npmjs.com/private-modules/ci-server-config#setting-up-environment-variables
-# for more deatils on setting this in something like `~/.bash_profile` and using `${NPM_TOKEN}`
-# in your `~/.npmrc` file instead of the actual value being hard-coded in there.
-# Also set NPM_PASSWORD to the password for the main account.
+# FIRST! ☝️
+# STORE NPM USER CREDS IN A SECRET in GKE ON GCP
 #
-# Second! ✌️
-# Choose your preferred method to create a CronJob in k8s
+#   $ kubectl create secret generic npm-token-rotation-npmuser-creds \
+#     --from-literal=user='user' \
+#     --from-literal=pass='pass' \
+#     --from-literal=token='token'
 #
-# OPTION 1: The `delete-and-create` method                  **RECOMMENDED**
+# SECOND! ✌️
+# CREATE CRONJOB IN GKE ON GCP
+#
+# There are a few ways to do this depending on the state of things.
+#
+# OPTION 1: The `delete-and-create` method                               **RECOMMENDED**
 #    $ kubectl delete npm-token-rotation
-#    $ envsubst < cronjob.yml | kubectl create -f -
+#    $ kubectl create -f cronjob.yml
 #
-# OPTION 2: The `modify-existing` method                    **MEH**
-# $ envsubst < cronjob.yml | kubectl apply -f -
+# OPTION 2: The `modify-existing` method                                 **MEH**
+#    $ kubectl apply -f cronjob.yml
 #
-# OPTION 3: Don't use this file, run this command instead   **DISCOURAGED**
-#   kubectl run npm-token-rotation \
-#     --schedule="@hourly" \
-#     --restart=OnFailure \
-#     --env="NPM_TOKEN=${NPM_TOKEN}"
-#     --image=yungjames/npm-token-rotation:0.0.1-B135251 \
-#     -- /app/jobs/rotate-npm-token.sh
+# OPTION 3: The `don't use this file, ru  n this command instead` method   **DISCOURAGED**
+#    $ kubectl run npm-token-rotation \
+#        --schedule="@hourly" \
+#        --restart=OnFailure \
+#        --env="NPM_TOKEN=${NPM_TOKEN}" \
+#        --env="NPM_USER=${NPM_USER}" \
+#        --env="NPM_PASS=${NPM_PASS}" \
+#        --image=yungjames/npm-token-rotation:1.0.0 \
+#        -- /app/jobs/rotate-npm-token.sh
 #
-# OPTION 4: The `edit-on-the-fly` method                    **DISCOURAGED**
-# $ kubectl edit cronjob npm-token-rotation
+# OPTION 4: The `edit-on-the-fly` method                                  **DISCOURAGED**
+#    $ kubectl edit cronjob npm-token-rotation
 #
 # ---
 #
@@ -54,7 +58,7 @@ spec:
         spec:
           containers:
           - name: npm-token-rotation
-            image: yungjames/npm-token-rotation:0.0.1-EC553C6
+            image: yungjames/npm-token-rotation:1.0.0-7AF8681
             command: ["/app/jobs/rotate-npm-token.sh"]
             env:
             - name: NPM_TOKEN

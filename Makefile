@@ -1,7 +1,7 @@
 build_id := $(shell uuidgen | cut -c1-7)
 repository_name = yungjames
 project_name = npm-token-rotation
-version = 0.0.1
+version = 1.0.0
 docker_tag = ${repository_name}/${project_name}:${version}-${build_id}
 
 
