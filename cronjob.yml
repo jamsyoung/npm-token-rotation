@@ -4,6 +4,7 @@
 # `npm login`. See https://docs.npmjs.com/private-modules/ci-server-config#setting-up-environment-variables
 # for more deatils on setting this in something like `~/.bash_profile` and using `${NPM_TOKEN}`
 # in your `~/.npmrc` file instead of the actual value being hard-coded in there.
+# Also set NPM_PASSWORD to the password for the main account.
 #
 # Second! ✌️
 # Choose your preferred method to create a CronJob in k8s
@@ -53,9 +54,22 @@ spec:
         spec:
           containers:
           - name: npm-token-rotation
-            image: yungjames/npm-token-rotation:0.0.1-B135251
+            image: yungjames/npm-token-rotation:0.0.1-EC553C6
             command: ["/app/jobs/rotate-npm-token.sh"]
             env:
             - name: NPM_TOKEN
-              value: "${NPM_TOKEN}" # requires `envsubst` to parse
+              valueFrom:
+                secretKeyRef:
+                  name: npm-token-rotation-npmuser-creds
+                  key: token
+            - name: NPM_USER
+              valueFrom:
+                secretKeyRef:
+                  name: npm-token-rotation-npmuser-creds
+                  key: user
+            - name: NPM_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: npm-token-rotation-npmuser-creds
+                  key: pass 
           restartPolicy: OnFailure
