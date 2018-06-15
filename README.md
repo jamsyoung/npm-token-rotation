@@ -47,7 +47,7 @@ $ NPM_TOKEN=token NPM_USER=user NPM_PASS=pass make run
 $ make push
 ```
 
-#### To remove all local docker remanents of this project
+#### To remove all local docker remnants of this project
 
 ```bash
 $ make clean

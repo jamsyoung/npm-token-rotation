@@ -18,7 +18,7 @@
 # OPTION 2: The `modify-existing` method                                 **MEH**
 #    $ kubectl apply -f cronjob.yml
 #
-# OPTION 3: The `don't use this file, ru  n this command instead` method   **DISCOURAGED**
+# OPTION 3: The `don't use this file, run this command instead` method   **DISCOURAGED**
 #    $ kubectl run npm-token-rotation \
 #        --schedule="@hourly" \
 #        --restart=OnFailure \
